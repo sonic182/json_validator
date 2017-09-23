@@ -58,6 +58,7 @@ def test_constrain_primitive():
     assert res is None and err == {'payload': 'INVALID PAYLOAD'}
 
     res, err = JsonValidator(constrain).validate(json)
+    assert res == json
     assert err == {'extra_1': 'Missing field', 'extra_2': 'Missing field'}
     del constrain['extra_1']
     del constrain['extra_2']
