@@ -1,6 +1,7 @@
 
 [![Build Status](https://travis-ci.org/sonic182/json_validator.svg?branch=master)](https://travis-ci.org/sonic182/json_validator)
 [![Coverage Status](https://coveralls.io/repos/github/sonic182/json_validator/badge.svg?branch=master)](https://coveralls.io/github/sonic182/json_validator?branch=master)
+[![PyPI version](https://badge.fury.io/py/sonic182_json_validator.svg)](https://badge.fury.io/py/sonic182_json_validator)
 # Json Validator
 
 A custom json validator.
