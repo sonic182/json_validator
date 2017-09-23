@@ -39,6 +39,12 @@ constrain = {
 
 See all rules for fields [here](https://github.com/sonic182/json_validator/blob/master/tests/validator.py).
 
+# Install
+
+```bash
+pip install sonic182_json_validator
+```
+
 # Development
 
 Install packages with pip-tools:

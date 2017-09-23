@@ -9,11 +9,12 @@ REQS2 = [str(ir.req) for ir in parse_requirements(
     'dev-requirements.txt', session='hack')]
 
 setup(
-    name='json_validator',
+    name='sonic182_json_validator',
     version='0.0.1',
     description='A custom json validator',
     author='Johanderson Mogollon',
     author_email='johanderson@mogollon.com.ve',
+    url='https://github.com/sonic182/json_validator',
     license='MIT',
     setup_requires=['pytest-runner'],
     test_requires=['pytest'],
