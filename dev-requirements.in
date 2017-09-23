@@ -1,0 +1,8 @@
+pylint
+pytest
+autopep8
+flake8
+flake8-docstrings
+jedi
+neovim
+coveralls
