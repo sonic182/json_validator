@@ -4,7 +4,12 @@ from re import match
 from datetime import datetime
 
 from json import loads
-from json.decoder import JSONDecodeError
+
+try:
+    from json.decoder import JSONDecodeError
+    unicode = str
+except ImportError:
+    JSONDecodeError = ValueError
 
 ERRORS = {
     '1': 'INVALID PAYLOAD',
@@ -57,7 +62,8 @@ class JsonValidator:
 
     def _key_match(self, obj, rules, key, field, started, res, errors):
         """Validate object with rueles."""
-        if not isinstance(obj, rules.get('type', str)):
+        if not isinstance(obj, (rules.get('type', str),
+                                rules.get('type', unicode))):
             if not self.special_types(obj, rules, key, field, res, errors):
                 errors[field] = 'Bad data type'
 
@@ -141,7 +147,7 @@ class JsonValidator:
     def _convert(data):
         """Check if given data is a string, and loads it."""
         if isinstance(data, (str, dict, list)):
-            if isinstance(data, str):
+            if isinstance(data, (str, unicode)):
                 try:
                     return (loads(data), False)
                 except JSONDecodeError:

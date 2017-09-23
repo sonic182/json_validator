@@ -11,3 +11,4 @@ logs/*.log
 htmlcov/
 .DS_Store
 .tox/
+*.pyc
