@@ -19,6 +19,10 @@ setup(
     test_requires=['pytest'],
     install_requires=REQS,
     extras_require={
-        'test': REQS2
+        'dev': REQS2,
+        'test': [
+            'pytest',
+            'coverage'
+        ]
     }
 )
