@@ -60,7 +60,6 @@ pip-sync requirements.txt dev-requirements.txt
 
 * Optional error messages defined in constrain (for i18n and more).
 * Maybe change recursive algorithm with secuential version.
-* Lazy validation.
 
 # Contribute
 

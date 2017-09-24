@@ -1,4 +1,5 @@
 """Json schema validator module."""
+# -*- coding: utf-8 -*-
 
 from re import match
 from datetime import datetime
@@ -20,11 +21,12 @@ ERRORS = {
 class JsonValidator:
     """Json Schema validator."""
 
-    def __init__(self, constrain):
+    def __init__(self, constrain, lazy=False):
         """Set the constrain in object."""
         if not isinstance(constrain, dict):
             raise AttributeError('constrain must be a dict')
         self.constrain = constrain
+        self.lazy = lazy
 
     def validate(self, data, field='', constrain=None, started=False):
         """Validate incoming data."""
@@ -54,9 +56,13 @@ class JsonValidator:
                     res[key] = constrain[key]['default']
                 else:
                     errors[field] = 'Missing field'
+                    if self.lazy:
+                        break
             else:
                 self._key_match(data[key], constrain[key], key, field, started,
                                 res, errors)
+                if errors and self.lazy:
+                    return res, errors
 
         return res, errors
 
@@ -64,11 +70,17 @@ class JsonValidator:
         """Validate object with rueles."""
         if not isinstance(obj, (rules.get('type', str),
                                 rules.get('type', unicode))):
-            if not self.special_types(obj, rules, key, field, res, errors):
+            if self.special_types(obj, rules, key, field, res, errors):
+                if errors and self.lazy:
+                    return res, errors
+            else:
                 errors[field] = 'Bad data type'
+                if self.lazy:
+                    return res, errors
 
         elif self._extra_validations(obj, rules, errors, field):
-            pass
+            if self.lazy:
+                return res, errors
 
         elif isinstance(obj, dict):
             res2, errors2 = self.validate(
@@ -78,6 +90,8 @@ class JsonValidator:
 
             if errors2:
                 errors[key] = errors2
+                if self.lazy:
+                    return res, errors
 
         elif isinstance(obj, list):
             res[key] = []
@@ -100,6 +114,9 @@ class JsonValidator:
                         errors[key] = []
                     errors[key].append(
                         errors2.get(ind, '') or errors2.get(field, ''))
+                    if self.lazy:
+                        return res, errors
+
         else:
             res[key] = obj
 
