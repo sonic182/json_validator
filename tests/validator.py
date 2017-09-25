@@ -31,12 +31,13 @@ def test_validator_valid_json():
 
 
 def test_recieves_invalid_payload():
+    """Test invalid payload retrival."""
     res, err = JsonValidator({}).validate('{as: "df"}')
     assert res is None and err == {'payload': 'INVALID PAYLOAD'}
 
 
 def test_constrain_primitive():
-    """Test constrain primitive types"""
+    """Test constrain primitive types."""
     constrain = {
         'string': {},
         'integer': {'type': int},
@@ -363,3 +364,15 @@ def test_error_messages():
         'g': 'Not retrieved',
 
     }
+
+
+def test_invalid_payload_error_message():
+    """Set message for invalid payload or constrain."""
+    decode_error = {'payload': 'Error on payload submitted'}
+    res, err = JsonValidator(
+        {}, decode_error=decode_error).validate('{as: "df"}')
+    assert res is None and err == decode_error
+
+    data_error = {'data': 'Error on constrain submitted'}
+    res, err = JsonValidator({}, data_error=data_error).validate(42)
+    assert res is None and err == data_error

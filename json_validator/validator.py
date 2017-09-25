@@ -21,12 +21,15 @@ ERRORS = {
 class JsonValidator:
     """Json Schema validator."""
 
-    def __init__(self, constrain, lazy=False):
+    def __init__(self, constrain, lazy=False, decode_error=None,
+                 data_error=None):
         """Set the constrain in object."""
         if not isinstance(constrain, dict):
             raise AttributeError('constrain must be a dict')
         self.constrain = constrain
         self.lazy = lazy
+        self.decode_error = decode_error
+        self.data_error = data_error
 
     def validate(self, data, field='', constrain=None, started=False):
         """Validate incoming data."""
@@ -39,8 +42,11 @@ class JsonValidator:
             data, err = self._convert(data)
             started = True
 
-            if err:
-                return (None, {'payload': ERRORS[err]})
+            if err and err == '1':
+                return (None, (self.decode_error or {'payload': ERRORS[err]}))
+            elif err and err == '2':
+                return (None, (
+                    self.data_error or {'payload': ERRORS[err]}))
 
         if constrain is None:
             return res, errors
