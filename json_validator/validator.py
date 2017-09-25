@@ -125,7 +125,7 @@ class JsonValidator:
     @staticmethod
     def special_types(obj, rules, key, field, res, errors):
         """Validate if special type retrieved."""
-        if rules['type'] == datetime:
+        if rules.get('type', str) == datetime:
             if rules.get('dformat', False):
                 try:
                     res[key] = datetime.strptime(obj, rules['dformat'])

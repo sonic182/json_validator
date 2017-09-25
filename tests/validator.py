@@ -48,8 +48,6 @@ def test_constrain_primitive():
         'list': {
             'type': list,
         },
-        'extra_1': {},
-        'extra_2': {},
     }
     json = {
         'string': 'foo',
@@ -60,20 +58,23 @@ def test_constrain_primitive():
         'list': []
     }
     res, err = JsonValidator(constrain).validate(json)
-    assert res == json
-    assert err == {'extra_1': 'Missing field', 'extra_2': 'Missing field'}
+    assert res == json and not err
 
-    del constrain['extra_1']
-    del constrain['extra_2']
-    constrain['integer']['type'] = str
+
+def test_invalid_type():
+    """Test invalid types."""
+    constrain = {
+        'string': {},
+        'extra_1': {},
+        'extra_2': {},
+    }
+    json = {
+        'string': 1234
+    }
 
     res, err = JsonValidator(constrain).validate(json)
-    assert err == {'integer': 'Bad data type'}
-
-    constrain['integer']['type'] = int
-
-    res, err = JsonValidator(constrain).validate(json)
-    assert res == json
+    assert err == {'string': 'Bad data type',
+                   'extra_1': 'Missing field', 'extra_2': 'Missing field'}
 
 
 def test_constrain_lists_dicts():
