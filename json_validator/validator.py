@@ -50,16 +50,17 @@ class JsonValidator:
             field = my_field
             field += '.' if my_field else ''
             field += key
+            rule = constrain[key]
 
             if key not in data:
-                if constrain[key].get('default', False):
-                    res[key] = constrain[key]['default']
+                if rule.get('default', False):
+                    res[key] = rule['default']
                 else:
-                    errors[field] = 'Missing field'
+                    errors[field] = rule.get('error', 'Missing field')
                     if self.lazy:
                         break
             else:
-                self._key_match(data[key], constrain[key], key, field, started,
+                self._key_match(data[key], rule, key, field, started,
                                 res, errors)
                 if errors and self.lazy:
                     return res, errors
@@ -74,7 +75,7 @@ class JsonValidator:
                 if errors and self.lazy:
                     return res, errors
             else:
-                errors[field] = 'Bad data type'
+                errors[field] = rules.get('type_error', 'Bad data type')
                 if self.lazy:
                     return res, errors
 
@@ -130,7 +131,8 @@ class JsonValidator:
                 try:
                     res[key] = datetime.strptime(obj, rules['dformat'])
                 except ValueError:
-                    errors[field] = 'Invalid format'
+                    errors[field] = rules.get(
+                        'dformat_error', 'Invalid format')
             else:
                 raise AttributeError('Missing `dformat` on datetime rule')
             return True
@@ -141,21 +143,26 @@ class JsonValidator:
         """Extras validations."""
         if isinstance(data, (int, float)):
             if rules.get('gt', False) and not data > rules['gt']:
-                errors[field] = 'Not greater than %i' % rules['gt']
+                errors[field] = rules.get(
+                    'gt_error', 'Not greater than {limit}').format(
+                        value=data, limit=rules['gt'])
                 return True
 
             elif rules.get('lt', False) and not data < rules['lt']:
-                errors[field] = 'Not less than %i' % rules['lt']
+                errors[field] = rules.get(
+                    'lt_error', 'Not less than {limit}').format(
+                        value=data, limit=rules['lt'])
                 return True
 
         if rules.get('format', False):
             if not match(rules['format'], data):
-                errors[field] = 'Invalid format'
+                errors[field] = rules.get(
+                    'format_error', 'Invalid format')
                 return True
 
         if rules.get('in', False):
             if data not in rules['in']:
-                errors[field] = 'Invalid'
+                errors[field] = rules.get('in_error', 'Invalid')
                 return True
 
         return False

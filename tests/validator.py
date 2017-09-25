@@ -301,3 +301,65 @@ def test_lazy_validation():
     json = {'a': ['a'], 'b': ['b']}
     res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert len(err) == 1
+
+
+def test_error_messages():
+    """Test validation exit when first error found."""
+    constrain = {
+        'a': {
+            'type': int,
+            'type_error': 'my message'
+        },
+
+        'b': {
+            'type': int,
+            'gt': 10,
+            'gt_error': '{value} not gt than {limit} error'
+        },
+
+        'c': {
+            'type': int,
+            'gt': 20,
+            'gt_error': 'Not gt than {limit} error'
+        },
+
+        'd': {
+            'format': r'^\d+$',
+            'format_error': 'Invalid format regex'
+        },
+
+        'e': {
+            'in': ['potato'],
+            'in_error': 'Not allowed'
+        },
+
+        'f': {
+            'type': datetime,
+            'dformat': '%Y-%m-%d',
+            'dformat_error': 'Invalid date format'
+        },
+
+        'g': {
+            'error': 'Not retrieved'
+        }
+    }
+    json = {
+        'a': {}, 'b': 10, 'c': 20, 'd': 'foo', 'e': 'bar', 'f': '18-08-2017'}
+    res, err = JsonValidator(constrain).validate(json)
+    assert not res and err == {
+        'a': 'my message',
+
+        'b': constrain['b']['gt_error'].format(
+            value=json.get('b', ''), limit=constrain['b']['gt']),
+
+        'c': constrain['c']['gt_error'].format(limit=constrain['c']['gt']),
+
+        'd': 'Invalid format regex',
+
+        'e': 'Not allowed',
+
+        'f': 'Invalid date format',
+
+        'g': 'Not retrieved',
+
+    }
