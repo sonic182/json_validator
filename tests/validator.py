@@ -376,3 +376,19 @@ def test_invalid_payload_error_message():
     data_error = {'data': 'Error on constrain submitted'}
     res, err = JsonValidator({}, data_error=data_error).validate(42)
     assert res is None and err == data_error
+
+
+def test_calls_default_lambda():
+    """Test default lambda is called when obtaining default."""
+    constrain = {
+        'expiration': {
+            'type': datetime,
+            'default': lambda: datetime.now()
+        }
+    }
+    json = {}
+    comparative = datetime.now()
+    res, err = JsonValidator(constrain).validate(json)
+    assert res and not err
+
+    assert res['expiration'] > comparative

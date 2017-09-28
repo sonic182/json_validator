@@ -60,7 +60,10 @@ class JsonValidator:
 
             if key not in data:
                 if rule.get('default', False):
-                    res[key] = rule['default']
+                    if callable(rule['default']):
+                        res[key] = rule['default']()
+                    else:
+                        res[key] = rule['default']
                 else:
                     errors[field] = rule.get('error', 'Missing field')
                     if self.lazy:

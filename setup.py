@@ -10,7 +10,7 @@ REQS2 = [str(ir.req) for ir in parse_requirements(
 
 setup(
     name='sonic182_json_validator',
-    version='0.0.9',
+    version='0.0.10',
     description='A custom json validator',
     author='Johanderson Mogollon',
     author_email='johanderson@mogollon.com.ve',
