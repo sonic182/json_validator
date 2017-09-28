@@ -8,7 +8,8 @@ A custom json validator.
 
 * Works with Python 2.7.x, 3.5.x, 3.6. It may work with 3.7.X
 * Constrains based on python types.
-
+* Lazy Validation
+* Constrain definitions with python types
 
 ```python
 from json_validator.validators import JsonValidator
