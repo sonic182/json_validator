@@ -8,9 +8,13 @@ from json import loads
 
 try:
     from json.decoder import JSONDecodeError
-    unicode = str
 except ImportError:
     JSONDecodeError = ValueError
+
+try:
+    a = unicode
+except NameError:
+    unicode = str
 
 ERRORS = {
     '1': 'INVALID PAYLOAD',
