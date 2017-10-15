@@ -31,106 +31,125 @@ class JsonValidator:
         self.decode_error = decode_error
         self.data_error = data_error
 
-    def validate(self, data, field='', constrain=None, started=False):
+    def validate(self, data, constrain=None):
         """Validate incoming data."""
         res = {}
         errors = {}
-        err = None
+        data, err = self._convert(data)
 
-        if not started:
-            constrain = self.constrain
-            data, err = self._convert(data)
-            started = True
+        if err and err in ('1', '2'):
+            return (None, (self.decode_error or {
+                'payload': ERRORS.get(err, '')}))
 
-            if err and err == '1':
-                return (None, (self.decode_error or {'payload': ERRORS[err]}))
-            elif err and err == '2':
-                return (None, (
-                    self.data_error or {'payload': ERRORS[err]}))
+        stack = []
+        constrain = constrain or self.constrain
+        my_field = ''
 
-        if constrain is None:
-            return res, errors
+        if constrain:
+            stack.append((res, errors, my_field, data, constrain))
 
-        my_field = field
-        for key in constrain:
-            field = my_field
-            field += '.' if my_field else ''
-            field += key
-            rule = constrain[key]
+        while stack:
+            temp_res, temp_errors, my_field, data, constrain = stack.pop()
 
-            if key not in data:
-                if rule.get('default', False):
-                    if callable(rule['default']):
-                        res[key] = rule['default']()
+            if constrain is None:
+                continue
+
+            for key, rule in constrain.items():
+                field = my_field + '.' + key if my_field else key
+
+                if key not in data:
+                    if rule.get('default', False):
+                        if callable(rule['default']):
+                            temp_res[key] = rule['default']()
+                        else:
+                            temp_res[key] = rule['default']
                     else:
-                        res[key] = rule['default']
+                        temp_errors[field] = rule.get('error', 'Missing field')
+                        if self.lazy:
+                            break
                 else:
-                    errors[field] = rule.get('error', 'Missing field')
-                    if self.lazy:
-                        break
-            else:
-                self._key_match(data[key], rule, key, field, started,
-                                res, errors)
-                if errors and self.lazy:
-                    return res, errors
-
-        return res, errors
-
-    def _key_match(self, obj, rules, key, field, started, res, errors):
-        """Validate object with rueles."""
-        if not isinstance(obj, (rules.get('type', str),
-                                rules.get('type', unicode))):
-            if self.special_types(obj, rules, key, field, res, errors):
-                if errors and self.lazy:
-                    return res, errors
-            else:
-                errors[field] = rules.get('type_error', 'Bad data type')
-                if self.lazy:
-                    return res, errors
-
-        elif self._extra_validations(obj, rules, errors, field):
-            if self.lazy:
-                return res, errors
-
-        elif isinstance(obj, dict):
-            res2, errors2 = self.validate(
-                obj, field, rules.get('properties', None), started)
-
-            res[key] = res2 or {}
-
-            if errors2:
-                errors[key] = errors2
-                if self.lazy:
-                    return res, errors
-
-        elif isinstance(obj, list):
-            res[key] = []
-            my_field2 = field
-            for ind, item in enumerate(obj):
-                field = my_field2
-                field += '.{}'.format(ind)
-                res[key].append(None)
-
-                res2, errors2 = self._key_match(item, rules.get(
-                    'items', {}), ind, field, started, res[key], {})
-
-                if res2:
-                    res[key] = res2
-                # Empty none items, required for recursivity to work
-                res[key] = [x for x in res[key] if x is not None]
-
-                if errors2:
-                    if errors.get(key, None) is None:
-                        errors[key] = []
-                    errors[key].append(
-                        errors2.get(ind, '') or errors2.get(field, ''))
-                    if self.lazy:
+                    self._key_match(data[key], rule, key, field, temp_res,
+                                    temp_errors, stack)
+                    if temp_errors and self.lazy:
+                        self.clean_data(res)
                         return res, errors
 
-        else:
-            res[key] = obj
+        self.clean_data(errors)
+        self.clean_data(res)
+        return res, errors
+
+    def _key_match(self, my_obj, my_rules, my_key, my_field, my_res, my_errors,
+                   stack):
+        """Validate object with rueles."""
+        matcheds = [(my_obj, my_rules, my_key, my_field, my_res, my_errors)]
+
+        while matcheds:
+            obj, rules, key, field, res, errors = matcheds.pop()
+            splitted = field.split('.')
+            err_field = field
+            
+            try:
+                err_field = int(splitted[len(splitted) - 1]) if splitted else field
+            except ValueError:
+                pass
+
+            if not isinstance(obj, (rules.get('type', str),
+                                    rules.get('type', unicode))):
+                if self.special_types(obj, rules, key, err_field, res, errors):
+                    if errors and self.lazy:
+                        return
+                else:
+                    errors[err_field] = rules.get('type_error', 'Bad data type')
+                    if self.lazy:
+                        return
+
+            elif self._extra_validations(obj, rules, errors, field):
+                if self.lazy:
+                    return
+
+            elif isinstance(obj, dict):
+                res[key] = {}
+                errors[key] = {}
+                stack.append((res[key], errors[key], field, obj,
+                              rules.get('properties', None)))
+
+            elif isinstance(obj, list):
+                res[key] = []
+                errors[key] = []
+                my_field2 = field
+                for ind, item in enumerate(obj):
+                    field = my_field2
+                    field += '.{}'.format(ind)
+                    res[key].append(None)
+                    errors[key].append(None)
+
+                    matcheds.append((item, rules.get('items', {}), ind, field,
+                                     res[key], errors[key]))
+
+            else:
+                res[key] = obj
 
         return res, errors
+
+    @classmethod
+    def clean_data(cls, error, key=None, parent=None):
+        """Clean empty errors."""
+        if isinstance(error, dict):
+            items = error.copy().items()
+            for _key, _value in items:
+                cls.clean_data(_value, _key, error)
+
+        elif isinstance(error, list):
+            aux = len(error)
+            while aux > 0:
+                aux -= 1
+                cls.clean_data(error[aux], aux, error)
+
+        if not error and parent:
+            if isinstance(parent, dict):
+                del parent[key]
+            else:
+                parent.pop(key)
 
     @staticmethod
     def special_types(obj, rules, key, field, res, errors):
