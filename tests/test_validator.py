@@ -58,8 +58,10 @@ def test_constrain_primitive():
         'json': {},
         'list': []
     }
+    json2 = json.copy()
+    JsonValidator.clean_data(json2)
     res, err = JsonValidator(constrain).validate(json)
-    assert res == json and not err
+    assert res == json2 and not err
 
 
 def test_invalid_type():
@@ -147,7 +149,7 @@ def test_constrain_lists_dicts():
     })
 
     res, err = JsonValidator(constrain).validate(json)
-    assert res == {'json': {'float': 12.12, 'integer': 42}, 'list': []}
+    assert res == {'json': {'float': 12.12, 'integer': 42}}
     assert err == {'list': ['Bad data type', 'Bad data type', 'Bad data type']}
 
 
@@ -374,7 +376,7 @@ def test_invalid_payload_error_message():
     assert res is None and err == decode_error
 
     data_error = {'data': 'Error on constrain submitted'}
-    res, err = JsonValidator({}, data_error=data_error).validate(42)
+    res, err = JsonValidator({}, decode_error=data_error).validate(42)
     assert res is None and err == data_error
 
 
