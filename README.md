@@ -59,7 +59,6 @@ pip-sync requirements.txt dev-requirements.txt
 
 # TODO
 
-* Maybe change recursive algorithm with secuential version.
 * Documentation about rules.
 
 # Contribute
