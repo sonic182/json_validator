@@ -58,10 +58,14 @@ def test_constrain_primitive():
         'json': {},
         'list': []
     }
-    json2 = json.copy()
-    JsonValidator.clean_data(json2)
+    json_res = {
+        'string': 'foo',
+        'integer': 42,
+        'float': 1.10,
+        'boolean': True,
+    }
     res, err = JsonValidator(constrain).validate(json)
-    assert res == json2 and not err
+    assert res == json_res and not err
 
 
 def test_invalid_type():
@@ -75,7 +79,7 @@ def test_invalid_type():
         'string': 1234
     }
 
-    res, err = JsonValidator(constrain).validate(json)
+    _, err = JsonValidator(constrain).validate(json)
     assert err == {'string': 'Bad data type',
                    'extra_1': 'Missing field', 'extra_2': 'Missing field'}
 
