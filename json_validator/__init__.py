@@ -12,7 +12,7 @@ except ImportError:
     JSONDecodeError = ValueError
 
 try:
-    a = unicode
+    UNICODE = unicode
 except NameError:
     unicode = str
 
