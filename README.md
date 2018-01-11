@@ -4,7 +4,7 @@
 [![PyPI version](https://badge.fury.io/py/sonic182_json_validator.svg)](https://badge.fury.io/py/sonic182_json_validator)
 # Json Validator
 
-A custom json validator.
+A json validator focused on speed.
 
 * Works with Python 2.7.x, 3.3.x, 3.4.x, 3.5.x, 3.6. It may work with 3.7.X
 * Constrains based on python types.
