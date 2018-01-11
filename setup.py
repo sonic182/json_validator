@@ -8,9 +8,12 @@ REQS = [str(ir.req) for ir in parse_requirements(
 REQS2 = [str(ir.req) for ir in parse_requirements(
     'dev-requirements.txt', session='hack')]
 
+with open('VERSION') as _file:
+    VERSION = _file.read()
+
 setup(
     name='sonic182_json_validator',
-    version='0.0.12',
+    version=VERSION,
     description='A custom json validator',
     author='Johanderson Mogollon',
     author_email='johanderson@mogollon.com.ve',
