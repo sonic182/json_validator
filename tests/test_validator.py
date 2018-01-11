@@ -3,7 +3,7 @@
 
 from json import dumps
 from datetime import datetime
-from json_validator.validator import JsonValidator
+from json_validator import JsonValidator
 
 
 def test_validator_needs_constrain():
