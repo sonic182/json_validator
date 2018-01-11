@@ -12,7 +12,7 @@ A custom json validator.
 * Constrain definitions with python types
 
 ```python
-from json_validator.validators import JsonValidator
+from json_validator import JsonValidator
 
 constrain = {
       'string': {},  # str by default.
@@ -28,9 +28,7 @@ constrain = {
       'string': 'foo',
       'integer': 42,
       'float': 1.10,
-      'boolean': True,
-      'json': {},
-      'list': []
+      'boolean': True
   }
   # accepts json string, dict and array.
   res, err = JsonValidator(constrain).validate(json)
@@ -39,7 +37,7 @@ constrain = {
 
 ```
 
-See all rules for fields [here](https://github.com/sonic182/json_validator/blob/master/tests/validator.py).
+See all rules for fields [here](https://github.com/sonic182/json_validator/blob/master/tests/test_validator.py).
 
 # Install
 
