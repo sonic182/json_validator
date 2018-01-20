@@ -1,0 +1,8 @@
+pylint
+autopep8
+flake8
+flake8-docstrings
+pytest
+pytest-cov
+mock
+pytest-mock
