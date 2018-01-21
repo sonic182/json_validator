@@ -6,11 +6,13 @@
 #
 attrs==17.4.0             # via pytest
 coverage==4.4.2           # via pytest-cov
+gprof2dot==2017.9.19      # via pytest-profiling
 mock==2.0.0
 pbr==3.1.1                # via mock
 pluggy==0.6.0             # via pytest
 py==1.5.2                 # via pytest
 pytest-cov==2.5.1
 pytest-mock==1.6.3
+pytest-profiling==1.2.11
 pytest==3.3.2
-six==1.11.0               # via mock, pytest
+six==1.11.0               # via mock, pytest, pytest-profiling

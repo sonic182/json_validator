@@ -2,22 +2,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import pytest
-
-
-@pytest.fixture
-def validator():
-    """Return validator fixture."""
-    from json_validator import JsonValidator
-    return JsonValidator
-
-
-@pytest.fixture
-def dumps():
-    """Return json dumps fixture."""
-    from json import dumps
-    return dumps
-
 
 def test_import_error(mocker):
     """Test import error."""
