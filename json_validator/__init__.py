@@ -137,25 +137,33 @@ class JsonValidator:
 
         return res, errors
 
-    @classmethod
-    def clean_data(cls, error, key=None, parent=None):
+    @staticmethod
+    def clean_data(_error, _key=None, _parent=None):
         """Clean empty errors."""
-        if isinstance(error, dict):
-            items = error.copy().items()
-            for _key, _value in items:
-                cls.clean_data(_value, _key, error)
+        stack = []
+        stack.append((_error, _key, _parent, True))
 
-        elif isinstance(error, list):
-            aux = len(error)
-            while aux > 0:
-                aux -= 1
-                cls.clean_data(error[aux], aux, error)
+        while stack:
+            error, key, parent, repeat = stack.pop()
 
-        if not error and parent:
-            if isinstance(parent, dict):
-                del parent[key]
-            else:
-                parent.pop(key)
+            if isinstance(error, dict):
+                if repeat:
+                    stack.append((error, key, parent, False))
+                    for _key in error:
+                        stack.append((error[_key], _key, error, True))
+
+            elif isinstance(error, list):
+                if repeat:
+                    stack.append((error, key, parent, False))
+                    for aux, item in enumerate(error):
+                        stack.append((item, aux, error, True))
+
+            if not error and parent:
+                if isinstance(parent, dict):
+                    if key in parent:
+                        del parent[key]
+                else:
+                    parent.pop(key)
 
     @staticmethod
     def special_types(obj, rules, key, field, res, errors):
