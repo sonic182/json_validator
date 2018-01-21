@@ -39,9 +39,6 @@ setup(
     install_requires=REQS,
     extras_require={
         'dev': REQS2,
-        'test': [
-            'pytest',
-            'coverage'
-        ]
+        'test': REQS2
     }
 )
