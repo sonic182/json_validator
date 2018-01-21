@@ -7,6 +7,8 @@ REQS = [str(ir.req) for ir in parse_requirements(
     'requirements.txt', session='hack')]
 REQS2 = [str(ir.req) for ir in parse_requirements(
     'dev-requirements.txt', session='hack')]
+REQS3 = [str(ir.req) for ir in parse_requirements(
+    'test-requirements.txt', session='hack')]
 
 with open('VERSION') as _file:
     VERSION = _file.read()
@@ -39,6 +41,6 @@ setup(
     install_requires=REQS,
     extras_require={
         'dev': REQS2,
-        'test': REQS2
+        'test': REQS3
     }
 )
