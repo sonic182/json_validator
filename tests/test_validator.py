@@ -1,46 +1,40 @@
 """Json schemas validator."""
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from json import dumps
+
+import pytest
+
+from json_validator import JsonValidator
 
 
-def test_import_error(mocker):
-    """Test import error."""
-    mocker.patch.dict('sys.modules', {'json.decoder': None})
-    import json_validator
-    assert True
-
-
-def test_validator_needs_constrain(validator):
+def test_validator_needs_constrain():
     """Test validator needs constrain."""
-    try:
-        validator('')
-        assert False
-    except AttributeError:
-        pass
-
-    assert validator({})
+    with pytest.raises(AttributeError):
+        JsonValidator('')
+    assert JsonValidator({})
 
 
-def test_validator_valid_json(validator, dumps):
+def test_validator_valid_json():
     """Test validator recieves a valid json."""
-    res, err = validator._convert("{'foo': 'bar'}")
+    res, err = JsonValidator._convert("{'foo': 'bar'}")
     assert err == '1' and not res
 
     data = {'foo': 'bar'}
-    res, err = validator._convert(dumps(data))
+    res, err = JsonValidator._convert(dumps(data))
     assert res == data and not err
 
-    res, err = validator._convert(1.0)
+    res, err = JsonValidator._convert(1.0)
     assert err and not res
 
 
-def test_recieves_invalid_payload(validator):
+def test_recieves_invalid_payload():
     """Test invalid payload retrival."""
-    res, err = validator({}).validate('{as: "df"}')
+    res, err = JsonValidator({}).validate('{as: "df"}')
     assert res is None and err == {'payload': 'INVALID PAYLOAD'}
 
 
-def test_constrain_primitive(validator):
+def test_constrain_primitive():
     """Test constrain primitive types."""
     constrain = {
         'string': {},
@@ -68,11 +62,11 @@ def test_constrain_primitive(validator):
         'float': 1.10,
         'boolean': True,
     }
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == json_res and not err
 
 
-def test_invalid_type(validator):
+def test_invalid_type():
     """Test invalid types."""
     constrain = {
         'string': {},
@@ -83,12 +77,12 @@ def test_invalid_type(validator):
         'string': 1234
     }
 
-    _, err = validator(constrain).validate(json)
+    _, err = JsonValidator(constrain).validate(json)
     assert err == {'string': 'Bad data type',
                    'extra_1': 'Missing field', 'extra_2': 'Missing field'}
 
 
-def test_constrain_lists_dicts(validator, dumps):
+def test_constrain_lists_dicts():
     """Test nested structures."""
     constrain = {
         'json': {
@@ -133,7 +127,7 @@ def test_constrain_lists_dicts(validator, dumps):
         }]
     })
 
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == {
         'json': {'float': 12.12, 'integer': 42},
         'list': [
@@ -156,12 +150,12 @@ def test_constrain_lists_dicts(validator, dumps):
         'list': [42, 61, 22]
     })
 
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == {'json': {'float': 12.12, 'integer': 42}}
     assert err == {'list': ['Bad data type', 'Bad data type', 'Bad data type']}
 
 
-def test_number_rules(validator):
+def test_number_rules():
     """Test rules on fields which are numbers."""
     constrain = {
         'integer': {
@@ -176,17 +170,17 @@ def test_number_rules(validator):
         }
     }
     json = {'integer': 101, 'float': -1.0}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not res and err == {'integer': 'Not less than 101',
                                'float': 'Not greater than -1'}
 
     json = {'integer': -1, 'float': 101.0}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not res and err == {'integer': 'Not greater than -1',
                                'float': 'Not less than 101'}
 
 
-def test_regex_rule(validator):
+def test_regex_rule():
     """Test fields ruled by regex."""
     constrain = {
         'number': {
@@ -194,15 +188,15 @@ def test_regex_rule(validator):
         }
     }
     json = {'number': 'one hundred'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert err == {'number': 'Invalid format'} and not res
 
     json = {'number': '42'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == json and not err
 
 
-def test_default_rule(validator):
+def test_default_rule():
     """Test fields ruled by regex."""
     constrain = {
         'number': {
@@ -211,11 +205,11 @@ def test_default_rule(validator):
         }
     }
     json = {}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == {'number': 42} and not err
 
 
-def test_inclusion_rule(validator):
+def test_inclusion_rule():
     """Test fields ruled by inclusion in list."""
     constrain = {
         'fruit': {
@@ -223,15 +217,15 @@ def test_inclusion_rule(validator):
         }
     }
     json = {'fruit': 'cherry'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not res and err == {'fruit': 'Invalid'}
 
     json = {'fruit': 'apple'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res == {'fruit': 'apple'} and not err
 
 
-def test_datetime_rule(validator):
+def test_datetime_rule():
     """Test fields is a datetime with custom format."""
     constrain = {
         'birthdate': {
@@ -241,33 +235,33 @@ def test_datetime_rule(validator):
     json = {'birthdate': '1990-12-24'}
 
     try:
-        validator(constrain).validate(json)
+        JsonValidator(constrain).validate(json)
         assert False
     except AttributeError:
         assert True
 
     constrain['birthdate']['dformat'] = '%Y-%m-%d'
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not err and res == {
         'birthdate': datetime.strptime('1990-12-24', '%Y-%m-%d')}
 
     json = {'birthdate': '1990-13-24'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not res and err == {'birthdate': 'Invalid format'}
 
 
-def test_lazy_validation(validator):
+def test_lazy_validation():
     """Test validation exit when first error found."""
     constrain = {
         'a': {'type': int, 'gt': 10},
         'b': {'type': int, 'lt': 100}
     }
     json = {'a': 'a', 'b': 'b'}  # lazy case diferent type
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert not res and len(err) == 1
 
     json = {'a': 9, 'b': 101}  # lazy extra validation
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert not res and len(err) == 1
 
     constrain = {
@@ -278,11 +272,11 @@ def test_lazy_validation(validator):
         'birthdate': '1990-12-24',
         'birthdate2': '1990-12-24'
     }
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert not res and len(err) == 1
 
     json = {}  #  empty field lazy error
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert not res and len(err) == 1
 
     constrain = {  # lazy dict field
@@ -296,7 +290,7 @@ def test_lazy_validation(validator):
         },
     }
     json = {'a': {}, 'b': {}}
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert len(err) == 1
 
     constrain = {  # lazy list field
@@ -310,11 +304,11 @@ def test_lazy_validation(validator):
         },
     }
     json = {'a': ['a'], 'b': ['b']}
-    res, err = validator(constrain, lazy=True).validate(json)
+    res, err = JsonValidator(constrain, lazy=True).validate(json)
     assert len(err) == 1
 
 
-def test_error_messages(validator):
+def test_error_messages():
     """Test validation exit when first error found."""
     constrain = {
         'a': {
@@ -356,7 +350,7 @@ def test_error_messages(validator):
     }
     json = {
         'a': {}, 'b': 10, 'c': 20, 'd': 'foo', 'e': 'bar', 'f': '18-08-2017'}
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert not res and err == {
         'a': 'my message',
 
@@ -376,19 +370,19 @@ def test_error_messages(validator):
     }
 
 
-def test_invalid_payload_error_message(validator):
+def test_invalid_payload_error_message():
     """Set message for invalid payload or constrain."""
     decode_error = {'payload': 'Error on payload submitted'}
-    res, err = validator(
+    res, err = JsonValidator(
         {}, decode_error=decode_error).validate('{as: "df"}')
     assert res is None and err == decode_error
 
     data_error = {'data': 'Error on constrain submitted'}
-    res, err = validator({}, decode_error=data_error).validate(42)
+    res, err = JsonValidator({}, decode_error=data_error).validate(42)
     assert res is None and err == data_error
 
 
-def test_calls_default_lambda(validator):
+def test_calls_default_lambda():
     """Test default lambda is called when obtaining default."""
     constrain = {
         'expiration': {
@@ -398,7 +392,7 @@ def test_calls_default_lambda(validator):
     }
     json = {}
     comparative = datetime.now()
-    res, err = validator(constrain).validate(json)
+    res, err = JsonValidator(constrain).validate(json)
     assert res and not err
 
     assert res['expiration'] > comparative
