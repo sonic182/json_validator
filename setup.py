@@ -8,7 +8,7 @@ RGX = re.compile('(\w+==[\d.]+)')
 
 def read_file(filename):
     """Read file correctly."""
-    with open(filename, encoding='utf-8') as _file:
+    with open(filename) as _file:
         return _file.read().strip()
 
 
