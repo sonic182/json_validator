@@ -7,7 +7,7 @@
 A json validator focused on speed.
 
 * Not recursion
-* Works with Python 2.7.x, 3.3.x, 3.4.x, 3.5.x, 3.6. It may work with 3.7.X
+* Works with Python 2.7.x, 3.4.x, 3.5.x, 3.6. It may work with 3.7.X
 * Constrains based on python types.
 * Lazy Validation
 * Constrain definitions with python types
