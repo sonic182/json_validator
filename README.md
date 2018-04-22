@@ -20,8 +20,8 @@ constrain = {
       'integer': {'type': int},
       'float': {'type': float},
       'boolean': {'type': bool},
-      'json': { 'type': dict },
-      'list': { 'type': list},
+      'json': {'type': dict },
+      'list': {'type': list},
       'extra_1': {},
       'extra_2': {},
   }
