@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.2] - 2018-04-22
+### Changed
+- Readme markdown to .rst
+
 ## [1.0.1] - 2018-04-22
 ### Added
 - Long description to readme
@@ -27,7 +31,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Importation of library
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/sonic182/json_validator/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/sonic182/json_validator/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/sonic182/json_validator/compare/v0.0.14...v1.0.0
 [0.0.14]: https://github.com/sonic182/json_validator/compare/v0.0.13...v0.0.14
