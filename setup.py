@@ -21,7 +21,7 @@ setup(
     name='sonic182_json_validator',
     version=read_file('VERSION'),
     description='A custom json validator',
-    long_description=read_file('README.md'),
+    long_description=read_file('README.rst'),
     author='Johanderson Mogollon',
     author_email='johanderson@mogollon.com.ve',
     url='https://github.com/sonic182/json_validator',
