@@ -1,4 +1,8 @@
-|Build Status| |Coverage Status| |PyPI version| # Json Validator
+
+|Build Status| |Coverage Status| |PyPI version|
+
+Json Validator
+==============
 
 A json validator focused on speed.
 
