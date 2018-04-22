@@ -1,22 +1,27 @@
 """Setup module."""
 
+import re
 from setuptools import setup
-from pip.req import parse_requirements
 
-REQS = [str(ir.req) for ir in parse_requirements(
-    'requirements.txt', session='hack')]
-REQS2 = [str(ir.req) for ir in parse_requirements(
-    'dev-requirements.txt', session='hack')]
-REQS3 = [str(ir.req) for ir in parse_requirements(
-    'test-requirements.txt', session='hack')]
+RGX = re.compile('(\w+==[\d.]+)')
 
-with open('VERSION') as _file:
-    VERSION = _file.read()
+
+def read_file(filename):
+    """Read file correctly."""
+    with open(filename, encoding='utf-8') as _file:
+        return _file.read().strip()
+
+
+def parse_requirements(filename):
+    """Parse requirements from file."""
+    return re.findall(RGX, read_file(filename)) or []
+
 
 setup(
     name='sonic182_json_validator',
-    version=VERSION,
+    version=read_file('VERSION'),
     description='A custom json validator',
+    long_description=read_file('README.md'),
     author='Johanderson Mogollon',
     author_email='johanderson@mogollon.com.ve',
     url='https://github.com/sonic182/json_validator',
@@ -38,9 +43,9 @@ setup(
     keywords='json validator dictionary',
     setup_requires=['pytest-runner'],
     test_requires=['pytest'],
-    install_requires=REQS,
+    install_requires=parse_requirements('requirements.txt'),
     extras_require={
-        'dev': REQS2,
-        'test': REQS3
+        'dev': parse_requirements('dev-requirements.txt'),
+        'test': parse_requirements('test-requirements.txt'),
     }
 )
