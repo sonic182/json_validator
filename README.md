@@ -31,7 +31,7 @@ constrain = {
       'float': 1.10,
       'boolean': True
   }
-  # accepts json string, dict and array.
+  # accepts json string, dict and lists.
   res, err = JsonValidator(constrain).validate(json)
   res == json  # => True
   err == {'extra_1': 'Missing field', 'extra_2': 'Missing field'}  # => True
