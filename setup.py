@@ -3,7 +3,7 @@
 import re
 from setuptools import setup
 
-RGX = re.compile('(\w+==[\d.]+)')
+RGX = re.compile('(\[w-]+==[\d.]+)')
 
 
 def read_file(filename):
