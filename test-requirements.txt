@@ -4,15 +4,34 @@
 #
 #    pip-compile --output-file test-requirements.txt test-requirements.in
 #
-attrs==17.4.0             # via pytest
-coverage==4.4.2           # via pytest-cov
-gprof2dot==2017.9.19      # via pytest-profiling
+attrs==17.4.0
+    # via pytest
+coverage==4.4.2
+    # via pytest-cov
+gprof2dot==2017.9.19
+    # via pytest-profiling
 mock==2.0.0
-pbr==3.1.1                # via mock
-pluggy==0.6.0             # via pytest
-py==1.5.2                 # via pytest
+    # via -r test-requirements.in
+pbr==3.1.1
+    # via mock
+pluggy==0.6.0
+    # via pytest
+py==1.10.0
+    # via pytest
 pytest-cov==2.5.1
+    # via -r test-requirements.in
 pytest-mock==1.6.3
+    # via -r test-requirements.in
 pytest-profiling==1.2.11
+    # via -r test-requirements.in
 pytest==3.3.2
-six==1.11.0               # via mock, pytest, pytest-profiling
+    # via
+    #   -r test-requirements.in
+    #   pytest-cov
+    #   pytest-mock
+    #   pytest-profiling
+six==1.11.0
+    # via
+    #   mock
+    #   pytest
+    #   pytest-profiling
